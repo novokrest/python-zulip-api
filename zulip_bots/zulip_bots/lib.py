@@ -163,6 +163,14 @@ class ExternalBotHandler(object):
         else:
             self._rate_limit.show_error_and_exit()
 
+    def upload_avatar(self, avatar_path):
+        # type: (str) -> Dict[str, Any]
+        if self._rate_limit.is_legal():
+            with open(avatar_path, 'rb') as avatar:
+                return self._client.upload_avatar(avatar)
+        else:
+            self._rate_limit.show_error_and_exit()
+
     def get_config_info(self, bot_name, optional=False):
         # type: (str, Optional[bool]) -> Dict[str, Any]
 

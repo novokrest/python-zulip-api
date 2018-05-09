@@ -676,6 +676,13 @@ class Client(object):
             files=[file]
         )
 
+    def upload_avatar(self, file):
+        # type: (IO[Any]) -> Dict[str, Any]
+        return self.call_endpoint(
+            url='users/me/avatar',
+            files=[file]
+        )
+
     def update_message(self, message_data):
         # type: (Dict[str, Any]) -> Dict[str, Any]
         '''
