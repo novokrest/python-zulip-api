@@ -37,6 +37,15 @@ class TestIDoneThisBot(BotTestCase, DefaultTests):
                               'I can\'t currently authenticate with idonethis. Can you check that your API key is correct? '
                               'For more information see my documentation.')
 
+    def test_unknown_error(self) -> None:
+        with self.mock_config_info({'api_key': '87654321', 'default_team': 'testing team 1'}), \
+                self.mock_http_conversation('test_500'), \
+                patch('zulip_bots.bots.idonethis.idonethis.api_noop'), \
+                patch('logging.error'):
+            self.verify_reply('list teams',
+                              'Oh dear, I\'m having problems processing your request right now. '
+                              'Perhaps you could try again later :grinning:')
+
     def test_list_team(self) -> None:
         with self.mock_config_info({'api_key': '12345678', 'default_team': 'testing team 1'}), \
                 self.mock_http_conversation('team_list'):
@@ -59,6 +68,12 @@ class TestIDoneThisBot(BotTestCase, DefaultTests):
                               'ID: `31415926535`\n'
                               'Created at: 2017-12-28T19:12:55.121+11:00')
             get_team_hashFunction.assert_called_with('testing team 1')
+
+    def test_show_team_not_found(self) -> None:
+        with self.mock_config_info({'api_key': '12345678', 'default_team': 'testing team 1'}), \
+                self.mock_http_conversation('test_show_team_not_found'):
+            self.verify_reply('team info testing team 100',
+                              "Sorry, it doesn't seem as if I can find a team named `testing team 100` :frowning:.")
 
     def test_entries_list(self) -> None:
         with self.mock_config_info({'api_key': '12345678', 'default_team': 'testing team 1'}), \
